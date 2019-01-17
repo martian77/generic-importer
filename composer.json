@@ -1,0 +1,19 @@
+{
+    "name": "vendor/php-project1",
+    "description": "Description of project PhpProject1.",
+    "authors": [
+        {
+            "name": "eleanor",
+            "email": "your@email.here"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0",
+        "monolog/monolog": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "GI": "src/"
+        }
+    } 
+}

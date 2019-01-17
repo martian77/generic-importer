@@ -1,0 +1,17 @@
+# System folders. 
+.DS_Store
+
+# Composer details. 
+/vendor
+
+# Log details 
+import_log.log
+
+# Test output files.
+test.csv
+
+# Local settings.
+settings.ini
+
+# IDE files. 
+nbproject
