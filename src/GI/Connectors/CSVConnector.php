@@ -19,6 +19,7 @@ class CSVConnector implements Connector {
      * @var 
      */
     private $fileHandle = null;
+    
     /**
      * 
      * @param string $outputName    Filename to write to.
@@ -52,6 +53,47 @@ class CSVConnector implements Connector {
         $this->closeFile();
     }
     
+    /**
+     * Read data from a CSV file.
+     * 
+     * @param string $inputName
+     * @param array $inputSettings
+     * @return array
+     */
+    public function readData( string $inputName, array $inputSettings)
+    {
+        $delimiter = empty($inputSettings['delimiter']) ? ',' : $inputSettings['delimiter'];
+        $readheaders = ! empty( $inputSettings['read_headers']);
+        
+        // Get the line endings set for macs. 
+        ini_set('auto_detect_line_endings', '1');
+        $this->openFile($inputName, 'read');
+        if ( $readheaders ) {
+            $headers = fgetcsv( $this->fileHandle, 0, $delimiter );
+        }
+        
+        $data = [];
+        while ( FALSE !== $row = fgetcsv( $this->fileHandle, 1000, $delimiter ) ) {
+            if ( $readheaders ) {
+                $data[] = $this->mergeHeaders($headers, $row);
+            }
+            else {
+                $data[] = $row;
+            }
+        }
+        
+        $this->closeFile();
+        
+        return $data;
+    }
+    
+    /**
+     * Opens a CSV file.
+     * 
+     * @param string $filename
+     * @param string $operation
+     * @throws \Exception
+     */
     private function openFile( string $filename, string $operation)
     {
         // First stop any open connection. 
@@ -78,11 +120,30 @@ class CSVConnector implements Connector {
         $this->fileHandle = $fileHandle;
     }
     
+    /**
+     * Closes the CSV file.
+     */
     private function closeFile( )
     {
         if ( ! empty( $this->fileHandle) ) {
             fclose($this->fileHandle);
             $this->fileHandle = null;
         }
+    }
+    
+    /**
+     * Merge the header values with the row. 
+     * 
+     * @param array $headers    Header values.
+     * @param array $row        Row data values.
+     * @return associative array.
+     */
+    private function mergeHeaders( $headers, $row )
+    {
+        $output_row = [];
+        foreach( $headers as $key => $header ) {
+            $output_row[$header] = $row[$key];
+        }
+        return $output_row;
     }
 }
